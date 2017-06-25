@@ -59,7 +59,7 @@ class Pool {
         a.messageQueue.length < b.messageQueue.length ? -1 : 1
       ))
       .slice(0, count)
-      .forEach(proc => this.kill(proc));
+      .forEach(proc => proc.kill());
   }
 
   _queueMessage(type, data, proc) {
@@ -90,7 +90,7 @@ function processNextMessage(pool, proc) {
   var availableProc, messageQueue;
 
   if (proc && proc.handle.connected && proc.state === States.stopped && !proc.messageQueue.length) {
-    proc.handle.disconnect();
+    proc.kill();
   }
 
   if (proc && proc.state === States.available && proc.messageQueue.length) {
@@ -111,8 +111,8 @@ function processNextMessage(pool, proc) {
 }
 
 function initProcess(pool, proc, file) {
-  pool.send("__init", file, proc).catch(error => {
-    pool.kill(proc);
+  proc.send("__init", file).catch(error => {
+    proc.kill();
 
     proc.messageQueue
       .splice(0)
