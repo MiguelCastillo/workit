@@ -111,8 +111,8 @@ function processNextMessage(pool, proc) {
 }
 
 function initProcess(pool, proc, file) {
-  pool.send("__init", file, proc).catch(error => {
-    pool.kill(proc);
+  proc.send("__init", file).catch(error => {
+    proc.kill();
 
     proc.messageQueue
       .splice(0)
