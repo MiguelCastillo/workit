@@ -1,12 +1,12 @@
 var workerApi;
 
 // Tag the current process as child... For convenience.
-Object.defineProperty(process, "isChild", {
+Object.defineProperty(process, "isWorker", {
   get: function() {
     return true;
   },
   set: function() {
-    throw new Error("isChild is a readonly property.");
+    throw new Error("isWorker is a readonly property.");
   }
 });
 
