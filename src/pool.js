@@ -90,7 +90,7 @@ function processNextMessage(pool, proc) {
   var availableProc, messageQueue;
 
   if (proc && proc.handle.connected && proc.state === States.stopped && !proc.messageQueue.length) {
-    proc.handle.disconnect();
+    proc.kill();
   }
 
   if (proc && proc.state === States.available && proc.messageQueue.length) {
