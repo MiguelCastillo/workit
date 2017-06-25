@@ -41,8 +41,8 @@ class Pool {
     var workers = Array.apply(null, Array(count)).map(() => new Worker(this, this.settings));
 
     workers.forEach(worker => {
-      registerProcHandlers(this, worker);
-      initProcess(this, worker, this.file);
+      registerWorkerHandlers(this, worker);
+      initWorker(this, worker, this.file);
     });
 
     this.workers = this.workers.concat(workers);
@@ -110,7 +110,7 @@ function processNextMessage(pool, worker) {
   }
 }
 
-function initProcess(pool, worker, file) {
+function initWorker(pool, worker, file) {
   worker.send("__init", file).catch(error => {
     worker.kill();
 
@@ -126,7 +126,7 @@ function initProcess(pool, worker, file) {
   });
 }
 
-function registerProcHandlers(pool, worker) {
+function registerWorkerHandlers(pool, worker) {
   worker.handle
     .on("error", (error) => {
       process.stderr.write(`===> process error [${worker.handle.pid}]` + error + "\n");
