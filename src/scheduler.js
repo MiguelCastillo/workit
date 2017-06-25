@@ -32,6 +32,12 @@ class Scheduler {
     });
   }
 
+  rejectQueue(error) {
+    this.messageQueue
+      .splice(0)
+      .forEach(envelope => envelope.reject(error));
+  }
+
   _processNextMessage(worker) {
     var pool = this.pool;
     var availableWorker, messageQueue;

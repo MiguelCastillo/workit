@@ -25,6 +25,10 @@ class Pool {
     this.workers.forEach((worker) => worker.stop());
   }
 
+  rejectQueue(error) {
+    this.scheduler.rejectQueue(error);
+  }
+
   size(size) {
     var currentSize = this.workers.length;
 

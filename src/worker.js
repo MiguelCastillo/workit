@@ -45,6 +45,12 @@ class Worker {
     }
   }
 
+  rejectQueue(error) {
+    this.messageQueue
+      .splice(0)
+      .forEach(envelope => envelope.reject(error));
+  }
+
   _sendMessage(envelope) {
     this.pending[envelope.message.id] = envelope;
     this.state = States.executing;
