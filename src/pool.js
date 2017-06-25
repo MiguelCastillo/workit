@@ -22,8 +22,8 @@ class Pool {
     return this._queueMessage(type, data);
   }
 
-  kill() {
-    this.workers.forEach((worker) => worker.kill());
+  stop() {
+    this.workers.forEach((worker) => worker.stop());
   }
 
   size(size) {
@@ -59,7 +59,7 @@ class Pool {
         a.messageQueue.length < b.messageQueue.length ? -1 : 1
       ))
       .slice(0, count)
-      .forEach(worker => worker.kill());
+      .forEach(worker => worker.stop());
   }
 
   _queueMessage(type, data, worker) {
@@ -90,7 +90,7 @@ function processNextMessage(pool, worker) {
   var availableWorker, messageQueue;
 
   if (worker && worker.handle.connected && worker.state === States.stopped && !worker.messageQueue.length) {
-    worker.kill();
+    worker.stop();
   }
 
   if (worker && worker.state === States.available && worker.messageQueue.length) {

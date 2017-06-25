@@ -42,7 +42,7 @@ class Worker {
     });
   }
 
-  kill() {
+  stop() {
     var pool = this.pool;
     var index = pool.workers.indexOf(this);
 
