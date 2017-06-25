@@ -36,7 +36,7 @@ class Scheduler {
     var pool = this.pool;
     var availableWorker, messageQueue;
 
-    if (worker && worker.handle.connected && worker.state === States.stopped && !worker.messageQueue.length) {
+    if (worker && worker.process.connected && worker.state === States.stopped && !worker.messageQueue.length) {
       worker.stop();
     }
 

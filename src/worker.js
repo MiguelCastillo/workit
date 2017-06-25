@@ -18,7 +18,7 @@ class Worker {
     this.pending = {};
     this.messageQueue = [];
     this.state = States.available;
-    this.handle = childProcess.fork(path.join(__dirname, "./worker-process.js"), [], this.settings);
+    this.process = childProcess.fork(path.join(__dirname, "./worker-process.js"), [], this.settings);
   }
 
   send(type, data) {
@@ -52,21 +52,21 @@ class Worker {
     if (index !== -1) {
       pool.workers.splice(index, 1);
       this.state = States.stopped;
-      this.handle.disconnect();
+      this.process.disconnect();
     }
   }
 
   _sendMessage(envelope) {
     this.pending[envelope.message.id] = envelope;
     this.state = States.executing;
-    this.handle.send(envelope.message);
+    this.process.send(envelope.message);
   }
 }
 
 function registerHandlers(worker) {
-  worker.handle
+  worker.process
     .on("error", (error) => {
-      process.stderr.write(`===> process error [${worker.handle.pid}]` + error + "\n");
+      process.stderr.write(`===> process error [${worker.process.pid}]` + error + "\n");
     })
     .on("message", (message) => {
       if (worker.pending.hasOwnProperty(message.id)) {
@@ -77,8 +77,8 @@ function registerHandlers(worker) {
       else if (typeof worker.pool.settings[message.type] === "function") {
         if (message.id) {
           Promise.resolve(worker.pool.settings[message.type](message.data))
-            .then(data => worker.handle.send({ id: message.id, data: data }))
-            .catch(error => worker.handle.send({ id: message.id, error: error }));
+            .then(data => worker.process.send({ id: message.id, data: data }))
+            .catch(error => worker.process.send({ id: message.id, error: error }));
         }
         else {
           worker.pool.settings[message.type](message.data);
