@@ -30,18 +30,7 @@ class Worker {
 
     return this.send("__init", file).catch(error => {
       this.stop();
-
-      this.messageQueue
-        .splice(0)
-        .forEach(envelope => envelope.reject("Unable to initialize worker.\n" + error));
-
-      var pool = this.pool;
-
-      if (!pool.workers.length && pool.messageQueue.length) {
-        pool.messageQueue
-          .splice(0)
-          .forEach(envelope => envelope.reject("Unable to initialize worker.\n" + error));
-      }
+      this.process.emit("error", error);
     });
   }
 
@@ -65,9 +54,6 @@ class Worker {
 
 function registerHandlers(worker) {
   worker.process
-    .on("error", (error) => {
-      process.stderr.write(`===> process error [${worker.process.pid}]` + error + "\n");
-    })
     .on("message", (message) => {
       if (worker.pending.hasOwnProperty(message.id)) {
         worker.state = worker.state === States.executing ? States.available : worker.state;
