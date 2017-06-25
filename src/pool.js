@@ -1,21 +1,15 @@
 "use strict";
 
-var path = require("path");
-var childProcess = require("child_process");
 var maxProcess = require("os").cpus().length;
 var States = require("./states");
+var Worker = require("./worker");
 
 class Pool {
   constructor (file, options) {
-    this.settings = Object.assign({
-      cwd: process.cwd(),
-      env: process.env,
-      silent: true,
-      size: 2
-    }, options);
+    options = options || {};
+    var size = Math.min(options.size || 2, maxProcess);
 
-    var size = Math.min(this.settings.size, maxProcess);
-
+    this.settings = Object.assign({}, options);
     this.file = file;
     this.id = 1;
     this.pending = {};
@@ -24,7 +18,51 @@ class Pool {
     this.size(size);
   }
 
-  send(type, data, proc) {
+  send(type, data) {
+    return this._queueMessage(type, data);
+  }
+
+  kill() {
+    this.procs.forEach((proc) => proc.kill());
+  }
+
+  size(size) {
+    var currentSize = this.procs.length;
+
+    if (size > currentSize) {
+      this._add(size - currentSize);
+    }
+    else if (size < currentSize) {
+      this._remove(currentSize - size);
+    }
+  }
+
+  _add(count) {
+    var procs = Array.apply(null, Array(count)).map(() => new Worker(this, this.settings));
+
+    procs.forEach(proc => {
+      registerProcHandlers(this, proc);
+      initProcess(this, proc, this.file);
+    });
+
+    this.procs = this.procs.concat(procs);
+  }
+
+  _remove(count) {
+    if (count <= 0) {
+      throw new Error("Number of items to be removed must be greater than 0");
+    }
+
+    this.procs
+      .sort((a, b) => (
+        a.state === States.available ? -1 :
+        a.messageQueue.length < b.messageQueue.length ? -1 : 1
+      ))
+      .slice(0, count)
+      .forEach(proc => this.kill(proc));
+  }
+
+  _queueMessage(type, data, proc) {
     return new Promise((resolve, reject) => {
       var id = this.id++;
       var messageQueue = proc ? proc.messageQueue : this.messageQueue;
@@ -45,60 +83,6 @@ class Pool {
       processNextMessage(this, proc);
       return result;
     });
-  }
-
-  kill(proc) {
-    if (proc) {
-      var index = this.procs.indexOf(proc);
-      if (index !== -1) {
-        this.procs.splice(index, 1);
-        proc.state = States.stopped;
-        proc.handle.disconnect();
-      }
-    }
-    else {
-      this.procs.forEach((proc) => this.kill(proc));
-    }
-  }
-
-  size(size) {
-    var currentSize = this.procs.length;
-
-    if (size > currentSize) {
-      this.add(size - currentSize);
-    }
-    else if (size < currentSize) {
-      this.remove(currentSize - size);
-    }
-  }
-
-  add(count) {
-    var procs = Array.apply(null, Array(count)).map(() => ({
-      messageQueue: [],
-      state: States.available,
-      handle: childProcess.fork(path.join(__dirname, "./child.js"), [], this.settings)
-    }));
-
-    procs.forEach(proc => {
-      registerProcHandlers(this, proc);
-      initProcess(this, proc, this.file);
-    });
-
-    this.procs = this.procs.concat(procs);
-  }
-
-  remove(count) {
-    if (count <= 0) {
-      throw new Error("Number of items to be removed must be greater than 0");
-    }
-
-    this.procs
-      .sort((a, b) => (
-        a.state === States.available ? -1 :
-        a.messageQueue.length < b.messageQueue.length ? -1 : 1
-      ))
-      .slice(0, count)
-      .forEach(proc => this.kill(proc));
   }
 }
 

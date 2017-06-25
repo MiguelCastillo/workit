@@ -1,4 +1,4 @@
-var childProcessApi;
+var workerApi;
 
 // Tag the current process as child... For convenience.
 Object.defineProperty(process, "isChild", {
@@ -23,12 +23,12 @@ process.on("message", function(message) {
 
 function initProcess(message) {
   try {
-    childProcessApi = require(message.data);
+    workerApi = require(message.data);
 
     // If the result of the loading the module is a function or class
     // then we try to instantiate it.
-    if (typeof childProcessApi === "function") {
-      childProcessApi = new childProcessApi();
+    if (typeof workerApi === "function") {
+      workerApi = new workerApi();
     }
 
     handleSuccess(message)();
@@ -40,7 +40,7 @@ function initProcess(message) {
 
 function processMessage(message) {
   try {
-    var deferred = childProcessApi[message.type](message.data,
+    var deferred = workerApi[message.type](message.data,
       (err, data) => err ? handleError(message)(err) : handleSuccess(message)(data)
     );
 
