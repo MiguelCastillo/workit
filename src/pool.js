@@ -59,7 +59,7 @@ class Pool {
         a.messageQueue.length < b.messageQueue.length ? -1 : 1
       ))
       .slice(0, count)
-      .forEach(proc => this.kill(proc));
+      .forEach(proc => proc.kill());
   }
 
   _queueMessage(type, data, proc) {
