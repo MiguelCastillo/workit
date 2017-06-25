@@ -42,7 +42,7 @@ class Pool {
 
     workers.forEach(worker => {
       registerWorkerHandlers(this, worker);
-      initWorker(this, worker, this.file);
+      worker.start(this.file);
     });
 
     this.workers = this.workers.concat(workers);
@@ -108,22 +108,6 @@ function processNextMessage(pool, worker) {
     availableWorker.state = States.executing;
     availableWorker.handle.send(envelope.message);
   }
-}
-
-function initWorker(pool, worker, file) {
-  worker.send("__init", file).catch(error => {
-    worker.kill();
-
-    worker.messageQueue
-      .splice(0)
-      .forEach(envelope => envelope.reject("Unable to initialize worker.\n" + error));
-
-    if (!pool.workers.length && pool.messageQueue.length) {
-      pool.messageQueue
-        .splice(0)
-        .forEach(envelope => envelope.reject("Unable to initialize worker.\n" + error));
-    }
-  });
 }
 
 function registerWorkerHandlers(pool, worker) {
