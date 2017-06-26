@@ -10,11 +10,17 @@ class Pool {
     options = options || {};
     var size = Math.min(options.size || 2, maxProcess);
 
+    this._api = {};
     this.settings = Object.assign({}, options);
     this.file = file;
     this.scheduler = new Scheduler(this);
     this.workers = [];
     this.size(size);
+  }
+
+  withApi(api) {
+    this._api = api;
+    return this;
   }
 
   send(type, data) {

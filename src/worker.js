@@ -65,14 +65,14 @@ function registerHandlers(worker) {
         handleResult(message, worker.pending[message.id]);
         delete worker.pending[message.id];
       }
-      else if (typeof worker.pool.settings[message.type] === "function") {
+      else if (typeof worker.pool._api[message.type] === "function") {
         if (message.id) {
-          Promise.resolve(worker.pool.settings[message.type](message.data))
+          Promise.resolve(worker.pool._api[message.type](message.data))
             .then(data => worker.process.send({ id: message.id, data: data }))
             .catch(error => worker.process.send({ id: message.id, error: error }));
         }
         else {
-          worker.pool.settings[message.type](message.data);
+          worker.pool._api[message.type](message.data);
         }
       }
     });
