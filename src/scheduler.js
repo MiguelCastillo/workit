@@ -56,7 +56,7 @@ class Scheduler {
     }
 
     if (availableWorker && jobs.length) {
-      availableWorker._do(jobs.shift()); // FILO
+      availableWorker._do(jobs.shift()); // FIFO
     }
   }
 }
