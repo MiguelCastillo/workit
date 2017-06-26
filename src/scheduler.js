@@ -6,15 +6,15 @@ class Scheduler {
   constructor(pool) {
     this.id = 1;
     this.pool = pool;
-    this.messageQueue = [];
+    this.jobs = [];
   }
 
   queue(type, data, worker) {
     return new Promise((resolve, reject) => {
       var id = this.id++;
-      var messageQueue = worker ? worker.messageQueue : this.messageQueue;
+      var jobs = worker ? worker.jobs : this.jobs;
 
-      messageQueue.push({
+      jobs.push({
         message: {
           id: id,
           type: type,
@@ -24,39 +24,39 @@ class Scheduler {
         reject: reject
       });
 
-      this._processNextMessage(worker);
+      this._processNextJob(worker);
     })
     .then((result) => {
-      this._processNextMessage(worker);
+      this._processNextJob(worker);
       return result;
     });
   }
 
   rejectQueue(error) {
-    this.messageQueue
+    this.jobs
       .splice(0)
       .forEach(envelope => envelope.reject(error));
   }
 
-  _processNextMessage(worker) {
+  _processNextJob(worker) {
     var pool = this.pool;
-    var availableWorker, messageQueue;
+    var availableWorker, jobs;
 
-    if (worker && worker.process.connected && worker.state === States.stopped && !worker.messageQueue.length) {
+    if (worker && worker.process.connected && worker.state === States.stopped && !worker.jobs.length) {
       worker.stop();
     }
 
-    if (worker && worker.state === States.available && worker.messageQueue.length) {
+    if (worker && worker.state === States.available && worker.jobs.length) {
       availableWorker = worker;
-      messageQueue = worker.messageQueue;
+      jobs = worker.jobs;
     }
     else {
       availableWorker = pool.workers.find((worker) => worker.state === States.available);
-      messageQueue = this.messageQueue;
+      jobs = this.jobs;
     }
 
-    if (availableWorker && messageQueue.length) {
-      availableWorker._sendMessage(messageQueue.shift()); // FILO
+    if (availableWorker && jobs.length) {
+      availableWorker._sendMessage(jobs.shift()); // FILO
     }
   }
 }

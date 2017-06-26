@@ -54,7 +54,7 @@ class Pool {
     this.workers
       .sort((a, b) => (
         a.state === States.available ? -1 :
-        a.messageQueue.length < b.messageQueue.length ? -1 : 1
+        a.jobs.length < b.jobs.length ? -1 : 1
       ))
       .slice(0, count)
       .forEach(worker => worker.stop());
