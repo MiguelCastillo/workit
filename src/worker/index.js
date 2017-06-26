@@ -34,14 +34,9 @@ class Worker {
   }
 
   stop() {
-    var pool = this.pool;
-    var index = pool.workers.indexOf(this);
-
-    if (index !== -1) {
-      pool.workers.splice(index, 1);
-      this.state = States.stopped;
-      this.process.disconnect();
-    }
+    this.pool._removeWorker(this);
+    this.state = States.stopped;
+    this.process.disconnect();
   }
 
   rejectQueue(error) {
