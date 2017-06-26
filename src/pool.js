@@ -1,8 +1,8 @@
 "use strict";
 
 var maxProcess = require("os").cpus().length;
-var States = require("./states");
 var Worker = require("./worker");
+var States = require("./worker/states");
 var Scheduler = require("./scheduler");
 
 class Pool {

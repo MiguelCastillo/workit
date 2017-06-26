@@ -1,6 +1,6 @@
 "use strict";
 
-var States = require("./states");
+var States = require("./worker/states");
 
 class Scheduler {
   constructor(pool) {

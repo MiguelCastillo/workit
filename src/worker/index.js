@@ -2,7 +2,7 @@
 
 var path = require("path");
 var childProcess = require("child_process");
-var States = require("../states");
+var States = require("./states");
 
 const defaults = {
   cwd: process.cwd(),
