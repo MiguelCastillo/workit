@@ -1,5 +1,5 @@
 var Pool = require("./src/pool");
-Pool.WorkerApi = require("./src/worker-api");
+Pool.WorkerApi = require("./src/worker/api");
 
 Object.defineProperty(Pool, "isWorker", {
   get: function() {

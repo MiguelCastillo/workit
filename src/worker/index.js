@@ -2,7 +2,7 @@
 
 var path = require("path");
 var childProcess = require("child_process");
-var States = require("./states");
+var States = require("../states");
 
 const defaults = {
   cwd: process.cwd(),
@@ -17,7 +17,7 @@ class Worker {
     this.pending = {};
     this.jobs = [];
     this.state = States.available;
-    this.process = childProcess.fork(path.join(__dirname, "./worker-process.js"), [], this.settings);
+    this.process = childProcess.fork(path.join(__dirname, "./process.js"), [], this.settings);
   }
 
   send(type, data) {

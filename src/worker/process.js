@@ -1,5 +1,4 @@
-var WorkerApi = require("./worker-api");
-
+var WorkerApi = require("./api");
 var workerApi;
 
 // Tag the current process as child... For convenience.
