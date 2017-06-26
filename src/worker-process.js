@@ -1,3 +1,5 @@
+var WorkerApi = require("./worker-api");
+
 var workerApi;
 
 // Tag the current process as child... For convenience.
@@ -25,9 +27,7 @@ function initProcess(message) {
   try {
     workerApi = require(message.data);
 
-    // If the result of the loading the module is a function or class
-    // then we try to instantiate it.
-    if (typeof workerApi === "function") {
+    if (typeof workerApi === "function" && Object.create(workerApi.prototype) instanceof WorkerApi) {
       workerApi = new workerApi();
     }
 
