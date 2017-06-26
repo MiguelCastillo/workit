@@ -9,7 +9,7 @@ class Scheduler {
     this.jobs = [];
   }
 
-  queue(type, data, worker) {
+  enqueue(type, data, worker) {
     return new Promise((resolve, reject) => {
       var id = this.id++;
       var jobs = worker ? worker.jobs : this.jobs;

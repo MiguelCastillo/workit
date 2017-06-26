@@ -20,14 +20,18 @@ class Worker {
     this.process = childProcess.fork(path.join(__dirname, "./process.js"), [], this.settings);
   }
 
-  send(type, data) {
-    return this.pool.scheduler.queue(type, data, this);
+  send(data) {
+    return this.pool.scheduler.enqueue(null, data, this);
+  }
+
+  invoke(fn, data) {
+    return this.pool.scheduler.enqueue(fn, data, this);
   }
 
   start(file) {
     registerHandlers(this);
 
-    return this.send("__init", file).catch(error => {
+    return this.invoke("__init", file).catch(error => {
       this.stop();
       this.process.emit("error", error);
     });
