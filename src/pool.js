@@ -28,7 +28,7 @@ class Pool {
   }
 
   stop() {
-    this.workers.forEach((worker) => worker.stop());
+    this.workers.forEach(worker => worker.stop());
   }
 
   rejectQueue(error) {
@@ -64,6 +64,16 @@ class Pool {
       ))
       .slice(0, count)
       .forEach(worker => worker.stop());
+  }
+
+  _removeWorker(worker) {
+    var index = this.workers.indexOf(worker);
+
+    if (index !== -1) {
+      var newWorkers = this.workers.slice(0);
+      newWorkers.splice(index, 1);
+      this.workers = newWorkers;
+    }
   }
 }
 
