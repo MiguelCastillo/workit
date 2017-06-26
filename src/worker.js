@@ -48,13 +48,13 @@ class Worker {
   rejectQueue(error) {
     this.jobs
       .splice(0)
-      .forEach(envelope => envelope.reject(error));
+      .forEach(job => job.reject(error));
   }
 
-  _sendMessage(envelope) {
-    this.pending[envelope.message.id] = envelope;
+  _do(job) {
+    this.pending[job.message.id] = job;
     this.state = States.executing;
-    this.process.send(envelope.message);
+    this.process.send(job.message);
   }
 }
 

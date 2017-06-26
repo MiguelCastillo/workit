@@ -35,7 +35,7 @@ class Scheduler {
   rejectQueue(error) {
     this.jobs
       .splice(0)
-      .forEach(envelope => envelope.reject(error));
+      .forEach(job => job.reject(error));
   }
 
   _processNextJob(worker) {
@@ -56,7 +56,7 @@ class Scheduler {
     }
 
     if (availableWorker && jobs.length) {
-      availableWorker._sendMessage(jobs.shift()); // FILO
+      availableWorker._do(jobs.shift()); // FILO
     }
   }
 }
