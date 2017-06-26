@@ -6,8 +6,7 @@ var States = require("./states");
 
 const defaults = {
   cwd: process.cwd(),
-  env: process.env,
-  silent: true,
+  env: process.env
 };
 
 class Worker {
