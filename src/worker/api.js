@@ -7,8 +7,12 @@ class WorkerApi {
   onStop() {
   }
 
-  send(type, data) {
+  invoke(type, data) {
     process.send({ type: type, data: data });
+  }
+
+  send(data) {
+    process.send({ data: data });
   }
 }
 
