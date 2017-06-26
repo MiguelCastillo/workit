@@ -23,8 +23,12 @@ class Pool {
     return this;
   }
 
-  send(type, data) {
-    return this.scheduler.queue(type, data);
+  send(data) {
+    return this.scheduler.enqueue(null, data);
+  }
+
+  invoke(fn, data) {
+    return this.scheduler.enqueue(fn, data);
   }
 
   stop() {

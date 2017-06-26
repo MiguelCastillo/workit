@@ -12,13 +12,18 @@ Object.defineProperty(process, "isWorker", {
 });
 
 process.on("message", function(message) {
-  switch(message.type) {
-    case "__init":
-      initProcess(message);
-      break;
-    default:
-      processMessage(message);
-      break;
+  if (message.type) {
+    switch(message.type) {
+      case "__init":
+        initProcess(message);
+        break;
+      default:
+        invokeMessage(message);
+        break;
+    }
+  }
+  else {
+    sendMessage(message);
   }
 });
 
@@ -37,11 +42,22 @@ function initProcess(message) {
   }
 }
 
-function processMessage(message) {
+function invokeMessage(message) {
   try {
-    var deferred = workerApi[message.type](message.data,
-      (err, data) => err ? handleError(message)(err) : handleSuccess(message)(data)
-    );
+    var deferred = workerApi[message.type](message.data, (err, data) => err ? handleError(message)(err) : handleSuccess(message)(data));
+
+    if (deferred) {
+      deferred.then(handleSuccess(message), handlerError(message));
+    }
+  }
+  catch(ex) {
+    handlerError(message)(ex);
+  }
+}
+
+function sendMessage(message) {
+  try {
+    var deferred = workerApi(message.data, (err, data) => err ? handleError(message)(err) : handleSuccess(message)(data));
 
     if (deferred) {
       deferred.then(handleSuccess(message), handlerError(message));
