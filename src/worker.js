@@ -16,7 +16,7 @@ class Worker {
     this.settings = Object.assign({}, defaults, options);
     this.pool = pool;
     this.pending = {};
-    this.messageQueue = [];
+    this.jobs = [];
     this.state = States.available;
     this.process = childProcess.fork(path.join(__dirname, "./worker-process.js"), [], this.settings);
   }
@@ -46,15 +46,15 @@ class Worker {
   }
 
   rejectQueue(error) {
-    this.messageQueue
+    this.jobs
       .splice(0)
-      .forEach(envelope => envelope.reject(error));
+      .forEach(job => job.reject(error));
   }
 
-  _sendMessage(envelope) {
-    this.pending[envelope.message.id] = envelope;
+  _do(job) {
+    this.pending[job.message.id] = job;
     this.state = States.executing;
-    this.process.send(envelope.message);
+    this.process.send(job.message);
   }
 }
 
