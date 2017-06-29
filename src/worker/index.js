@@ -40,7 +40,10 @@ class Worker {
   stop() {
     this.pool._removeWorker(this);
     this.state = States.stopped;
-    this.process.disconnect();
+
+    if (this.process.connected) {
+      this.process.disconnect();
+    }
   }
 
   rejectQueue(error) {
