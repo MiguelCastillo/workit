@@ -1,7 +1,7 @@
 "use strict";
 
 var WorkerApi = require("./api");
-var workerApi;
+var api;
 
 // Tag the current process as child... For convenience.
 Object.defineProperties(process, {
@@ -29,10 +29,10 @@ process.on("message", function(message) {
 
 function initProcess(message) {
   try {
-    workerApi = require(message.data);
+    var Api = require(message.data);
 
-    if (typeof workerApi === "function" && Object.create(workerApi.prototype) instanceof WorkerApi) {
-      workerApi = new workerApi();
+    if (typeof Api === "function" && Object.create(Api.prototype) instanceof WorkerApi) {
+      api = new Api();
     }
 
     handleSuccess(message)();
@@ -44,7 +44,7 @@ function initProcess(message) {
 
 function invokeMessage(message) {
   try {
-    var deferred = workerApi[message.type](message.data, (err, data) => err ? handleError(message)(err) : handleSuccess(message)(data));
+    var deferred = api[message.type](message.data, (err, data) => err ? handleError(message)(err) : handleSuccess(message)(data));
 
     if (deferred) {
       deferred.then(handleSuccess(message), handlerError(message));
@@ -57,7 +57,7 @@ function invokeMessage(message) {
 
 function sendMessage(message) {
   try {
-    var deferred = workerApi(message.data, (err, data) => err ? handleError(message)(err) : handleSuccess(message)(data));
+    var deferred = api(message.data, (err, data) => err ? handleError(message)(err) : handleSuccess(message)(data));
 
     if (deferred) {
       deferred.then(handleSuccess(message), handlerError(message));
