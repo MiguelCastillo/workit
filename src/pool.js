@@ -84,6 +84,8 @@ class Pool {
 
   _enqueue(fn, data, worker) {
     return new Promise((resolve, reject) => {
+      // I would love to use a weak map keyed by worker instance. This would
+      // remove the need to have an array of jobs in the worker.
       var jobs = worker ? worker.jobs : this.jobs;
 
       jobs.push({
