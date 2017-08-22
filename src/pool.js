@@ -1,7 +1,7 @@
 "use strict";
 
 var maxProcess = require("os").cpus().length;
-var Worker = require("./worker");
+var Worker = require("./worker/adapter");
 var States = require("./worker/states");
 var Scheduler = require("./scheduler");
 
