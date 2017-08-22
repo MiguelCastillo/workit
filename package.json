@@ -1,5 +1,5 @@
 {
-  "name": "worker-swarm",
+  "name": "workit",
   "version": "0.0.1",
   "description": "worker swarm",
   "main": "index.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MiguelCastillo/worker-swarm.git"
+    "url": "git+https://github.com/MiguelCastillo/workit.git"
   },
   "author": "Miguel Castillo <manchagnu@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/MiguelCastillo/worker-swarm/issues"
+    "url": "https://github.com/MiguelCastillo/workit/issues"
   },
-  "homepage": "https://github.com/MiguelCastillo/worker-swarm#readme",
+  "homepage": "https://github.com/MiguelCastillo/workit#readme",
   "engines": {
     "node": ">=4"
   }
