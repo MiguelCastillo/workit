@@ -21,11 +21,11 @@ class Adapter {
   }
 
   send(data) {
-    return this.pool.scheduler.enqueue(null, data, this);
+    return this.pool.send(data, this);
   }
 
   invoke(fn, data) {
-    return this.pool.scheduler.enqueue(fn, data, this);
+    return this.pool.invoke(fn, data, this);
   }
 
   start(file) {
