@@ -1,9 +1,9 @@
 "use strict";
 
 var path = require("path");
-var Workit = require("../../index");
+var Work = require("../../index");
 
-class Pool extends Workit.Pool {
+class Pool extends Work.Pool {
   workerSaid(data) {
     console.log(process.pid, process.isWorker, data);
   }

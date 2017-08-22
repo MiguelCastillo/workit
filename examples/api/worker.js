@@ -1,8 +1,8 @@
 "use strict";
 
-var Workit = require("../../");
+var Work = require("../../");
 
-class Api extends Workit.Worker {
+class Api extends Work.Worker {
   say(data, done) {
     console.log(process.pid, process.isWorker, data);
     done();

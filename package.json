@@ -1,5 +1,5 @@
 {
-  "name": "workit",
+  "name": "work-balance",
   "version": "0.0.1",
   "description": "worker pool for managing parallel processing of jobs (tasks)",
   "main": "index.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MiguelCastillo/workit.git"
+    "url": "git+https://github.com/MiguelCastillo/work-balance.git"
   },
   "author": "Miguel Castillo <manchagnu@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/MiguelCastillo/workit/issues"
+    "url": "https://github.com/MiguelCastillo/work-balance/issues"
   },
-  "homepage": "https://github.com/MiguelCastillo/workit#readme",
+  "homepage": "https://github.com/MiguelCastillo/work-balance#readme",
   "engines": {
     "node": ">=4"
   }
