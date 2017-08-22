@@ -67,24 +67,14 @@ function registerHandlers(worker) {
         handleResult(message, worker.pending[message.id]);
         delete worker.pending[message.id];
       }
-      else if (message.type && typeof worker.pool._api[message.type] === "function") {
+      else if (message.type && typeof worker.pool[message.type] === "function") {
         if (message.id) {
-          Promise.resolve(worker.pool._api[message.type](message.data))
+          Promise.resolve(worker.pool[message.type](message.data))
             .then(data => worker.process.send({ id: message.id, data: data }))
             .catch(error => worker.process.send({ id: message.id, error: error }));
         }
         else {
-          worker.pool._api[message.type](message.data);
-        }
-      }
-      else if (!message.type && typeof worker.pool._api === "function") {
-        if (message.id) {
-          Promise.resolve(worker.pool._api(message.data))
-            .then(data => worker.process.send({ id: message.id, data: data }))
-            .catch(error => worker.process.send({ id: message.id, error: error }));
-        }
-        else {
-          worker.pool._api(message.data);
+          worker.pool[message.type](message.data);
         }
       }
       else {
