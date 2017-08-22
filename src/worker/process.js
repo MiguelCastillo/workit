@@ -30,11 +30,7 @@ process.on("message", function(message) {
 function initProcess(message) {
   try {
     var Api = require(message.data);
-
-    if (typeof Api === "function" && Object.create(Api.prototype) instanceof WorkerApi) {
-      api = new Api();
-    }
-
+    api = typeof Api === "function" && Object.create(Api.prototype) instanceof WorkerApi ? new Api() : Api;
     handleSuccess(message)();
   }
   catch(ex) {
