@@ -1,21 +1,21 @@
 {
-  "name": "worker-pool",
+  "name": "worker-swarm",
   "version": "0.0.1",
-  "description": "worker pool",
+  "description": "worker swarm",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MiguelCastillo/worker-pool.git"
+    "url": "git+https://github.com/MiguelCastillo/worker-swarm.git"
   },
   "author": "Miguel Castillo <manchagnu@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/MiguelCastillo/worker-pool/issues"
+    "url": "https://github.com/MiguelCastillo/worker-swarm/issues"
   },
-  "homepage": "https://github.com/MiguelCastillo/worker-pool#readme",
+  "homepage": "https://github.com/MiguelCastillo/worker-swarm#readme",
   "engines": {
     "node": ">=4"
   }
