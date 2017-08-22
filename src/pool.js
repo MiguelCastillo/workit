@@ -3,7 +3,7 @@
 var maxProcess = require("os").cpus().length;
 var Worker = require("./worker/adapter");
 var States = require("./worker/states");
-var Scheduler = require("./scheduler");
+var id = 1;
 
 class Pool {
   constructor (file, options) {
@@ -13,7 +13,7 @@ class Pool {
     this._api = {};
     this.settings = Object.assign({}, options);
     this.file = file;
-    this.scheduler = new Scheduler(this);
+    this.jobs = [];
     this.workers = [];
     this.size(size);
   }
@@ -23,12 +23,12 @@ class Pool {
     return this;
   }
 
-  send(data) {
-    return this.scheduler.enqueue(null, data);
+  send(data, worker) {
+    return this._enqueue(null, data, worker);
   }
 
-  invoke(fn, data) {
-    return this.scheduler.enqueue(fn, data);
+  invoke(fn, data, worker) {
+    return this._enqueue(fn, data, worker);
   }
 
   stop() {
@@ -36,7 +36,9 @@ class Pool {
   }
 
   rejectQueue(error) {
-    this.scheduler.rejectQueue(error);
+    this.jobs
+      .splice(0)
+      .forEach(job => job.reject(error));
   }
 
   size(size) {
@@ -77,6 +79,49 @@ class Pool {
       var newWorkers = this.workers.slice(0);
       newWorkers.splice(index, 1);
       this.workers = newWorkers;
+    }
+  }
+
+  _enqueue(fn, data, worker) {
+    return new Promise((resolve, reject) => {
+      var jobs = worker ? worker.jobs : this.jobs;
+
+      jobs.push({
+        message: {
+          id: id++,
+          type: fn,
+          data: data
+        },
+        resolve: resolve,
+        reject: reject
+      });
+
+      this._processNextJob(worker);
+    })
+    .then((result) => {
+      this._processNextJob(worker);
+      return result;
+    });
+  }
+
+  _processNextJob(worker) {
+    var availableWorker, jobs;
+
+    if (worker && worker.process.connected && worker.state === States.stopped && !worker.jobs.length) {
+      worker.stop();
+    }
+
+    if (worker && worker.state === States.available && worker.jobs.length) {
+      availableWorker = worker;
+      jobs = worker.jobs;
+    }
+    else {
+      availableWorker = this.workers.find((worker) => worker.state === States.available);
+      jobs = this.jobs;
+    }
+
+    if (availableWorker && jobs.length) {
+      availableWorker._do(jobs.shift()); // FIFO
     }
   }
 }
