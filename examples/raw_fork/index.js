@@ -3,7 +3,7 @@
 var childProcess = require("child_process");
 var path = require("path");
 
-var procs = build(2, path.join(__dirname, "./worker.js"), {
+build(2, path.join(__dirname, "./worker.js"), {
   cwd: process.cwd(),
   env: process.env,
   silent: true
