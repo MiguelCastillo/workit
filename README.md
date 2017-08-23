@@ -1,6 +1,8 @@
 # workit
 workit is a worker pool that manages parallel processing of jobs (tasks). The approach is that of a thread pool in which a queue of jobs exists and workers pick new jobs as they finish their work.
 
+> Currently the name workit is taken up in npm by the now defunct project (https://github.com/shannonmoeller/workit). But the author (Shannon) of that project has been kind enough to let me have the name. Once I get the name I should be able to publish this to npm, which will hopefully happen in the next few days.
+
 # API
 
 ## Workit
