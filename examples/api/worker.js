@@ -3,9 +3,9 @@
 var Workit = require("../../");
 
 class Api extends Workit.Worker {
-  say(data, done) {
+  say(data) {
     console.log(process.pid, process.isWorker, data);
-    done();
+    return Promise.resolve("done");
   }
 }
 
