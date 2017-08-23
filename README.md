@@ -24,7 +24,7 @@ Method to send data to a worker function.
 - data - payload to be sent to the worker process. It can be anything.
 - worker - optional worker instance that should process the data. Otherwise, the scheduling algorithm will pick the worker for you, which is the default behavior.
 
-The call returns promise that resolves when the worker process calls `done` or resolves the promise it returns.
+The call returns a promise that resolves when the worker process either calls `done` or resolves the promise it returns.
 
 The example below sends a string to be processed by a worker function.
 ``` javascript
@@ -39,7 +39,7 @@ Method that invokes a method define in a worker module.
 - data - payload to be sent to the worker process. It can be anything.
 - worker - optional worker instance that should process the data. Otherwise, the scheduling algorithm will pick the worker for you, which is the default behavior.
 
-The call returns promise that resolves when the worker process calls `done` or resolves the promise it returns.
+The call returns a promise that resolves when the worker process either calls `done` or resolves the promise it returns.
 
 The example below sends a string to be process by the method `say` in a worker api.
 ``` javascript
