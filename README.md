@@ -1,105 +1,20 @@
 # workit
-workit is a worker pool that manages parallel processing of jobs (tasks). The approach is that of a thread pool in which a queue of jobs exists and workers pick new jobs as they finish their work.
+Workit is a utility for parallel processing. The approach is that of a thread pool in which a queue of jobs exists and workers pick new jobs as they finish their work. But instead of using threads, we use child processes.
 
-> Currently the name workit is taken up in npm by the now defunct project (https://github.com/shannonmoeller/workit). But the author (Shannon) of that project has been kind enough to let me have the name. Once I get the name I should be able to publish this to npm, which will hopefully happen in the next few days.
+Parallel processing is traditionally difficult code to write, and that's exactly the problem workit aims to solve for you. Workit accomplishes this by providing you with abstractions for easily defining a Worker API you interact with, managing the lifecycle of the worker processes, and managing the distribution of the workload. All you have to do is define a Worker API that you interact with via a Worker Pool.
 
-# API
+So how does this thing work?  Well - let's think about the setup starting with the worker. A worker is ultimately the child process that processes your data, and you have a couple of ways to define one.
 
-## Workit
+- A module that exports a function which we refer to as a worker function.
+- A module that exports an API by defining class that extends `Worker` with methods that process your data. We refer to this as a Worker API.
 
-Is a module that exposes three main items.
-
-- Pool
-- Worker
-- isWorker
-
-## Pool
-
-Class that manages the worker processes. You can extend Pool in order to introduce methods that worker processes can invoke. You can take a look at the example below for `Worker process talking to Process pool`.
-
-### send(data, worker)
-
-Method to send data to a worker function.
-
-- data - payload to be sent to the worker process. It can be anything.
-- worker - optional worker instance that should process the data. Otherwise, the scheduling algorithm will pick the worker for you, which is the default behavior.
-
-The call returns a promise that resolves when the worker process either calls `done` or resolves the promise it returns.
-
-The example below sends a string to be processed by a worker function.
-``` javascript
-workerPool.send("Hello world").then(() => console.log("done"));
-```
-
-### invoke(fn, data, worker)
-
-Method that invokes a method define in a worker module.
-
-- fn - method to be called in the worker process.
-- data - payload to be sent to the worker process. It can be anything.
-- worker - optional worker instance that should process the data. Otherwise, the scheduling algorithm will pick the worker for you, which is the default behavior.
-
-The call returns a promise that resolves when the worker process either calls `done` or resolves the promise it returns.
-
-The example below sends a string to be process by the method `say` in a worker api.
-``` javascript
-workerPool.invoke("say", "Hello world").then(() => console.log("done"));
-```
-
-### stop()
-
-Method that stops all workers from processing further messages. All workers will finish processing whatever they are doing before they exit.
-
-``` javascript
-workerPool.stop();
-```
-
-### rejectQueue(error)
-
-Method the rejects all queued jobs that are pending processing. The jobs are rejected with the given error.
-
-``` javascript
-workerPool.rejectQueue();
-```
-
-### size(value)
-
-Method that sets the size of the worker pool. The value is absolute, meaning that if you specify 4 then the pool will have a size of 4 worker processes. If the value is smaller than the current, then the pool is reduced to that size gracefully allowing the worker that are going to be removed finish their work. If the value is bigger than the current, then the pool size is increased and jobs are assigned to each worker as needed.
-
-- value - the new size of the worker pool.
-
-``` javascript
-workerPool.size(2);
-```
-
-## Worker
-
-Class that allows you to define an API that a worker pool can invoke. All you need to do is extend the Worker class to define your API methods, and export it. Workit will internally manage the life cycle of your worker API. The methods exposed by the API get two parameters
-
-- data - data to be processed by the method
-- done - a function to be called when the worker method has finished processing the data. You can alternatively return a Promise. If any data is passed to `done` or the resolved promise, that data will be received by the process pool promise returned by `invoke` or `send`.
-
-Export a simple worker api with a method `say` that a pool can invoke.
-``` javascript
-import Workit form 'workit';
-
-class Worker extends Workit.Worker {
-  say(data) {
-    return Promise.resolve("got it");
-  }
-}
-
-export default Worker;
-```
-
-## isWorker
-
-Flag that is true if the code reading the value is executing in a worker process. Otherwise the value is not defined. `isWorker` is also available in `process.isWorker`.
-
+Then you have a worker pool, which is the component you interact with to talk to the workers. A worker pool exposes several methods, but the two important ones for interacting with worker processes are `send` and `invoke`. You use `send` when interacting with a worker function, and you use `invoke` when you interact with a Worker API.
 
 # Examples
 
 ## basic setup
+
+The most basic setup is when the pool and the worker are both defined in the same file. This is perhaps an overly simplistic setup, but it is available if you need it.
 
 ``` javascript
 import Workit from "workit";
@@ -214,3 +129,131 @@ run it
 ```
 $ node index.js
 ```
+
+
+# API
+
+## Workit
+
+workit provides you with several different constructs to make parallel processing simple.
+
+- Pool
+- Worker
+- isWorker
+
+## Pool
+
+Class that manages the queue of jobs and worker processes. You can extend Pool in order to define methods that worker processes can invoke, which allows you to build a two way communication between parent and child processes. You can take a look at the example below for `Worker process talking to Process pool`.
+
+
+### send(data, worker)
+
+Method to send data to a Worker function.
+
+- data - payload to be sent to the worker process. It can be anything.
+- worker - optional worker instance that should process the data. Otherwise, the scheduling algorithm will pick the worker for you, which is the default behavior.
+
+The call returns a promise that resolves when the worker process is done processing the data.
+
+The example below sends a string to be processed by a worker function.
+``` javascript
+workerPool.send("Hello world").then(() => console.log("done"));
+```
+
+### invoke(fn, data, worker)
+
+Method that invokes a method defined in a Worker API.
+
+- fn - method to be called in the Worker API.
+- data - payload to be sent to the Worker API method (fn). It can be anything.
+- worker - optional worker instance that should process the data. Otherwise, the scheduling algorithm will pick the worker for you, which is the default behavior.
+
+The call returns a promise that resolves when the worker process is done processing the data.
+
+The example below sends a string to be process by the method `say` in a worker api.
+``` javascript
+workerPool.invoke("say", "Hello world").then(() => console.log("done"));
+```
+
+### stop()
+
+Method that stops all workers from processing further jobs. All workers will finish processing whatever they are doing before they exit.
+
+``` javascript
+workerPool.stop();
+```
+
+### rejectQueue(error)
+
+Method the rejects all queued jobs that are pending processing. The jobs are rejected with the given error.
+
+``` javascript
+workerPool.rejectQueue();
+```
+
+### size(value)
+
+Method that sets the size of the worker pool. The value is absolute, meaning that if you specify 4 then the pool will have a size of 4 worker processes. If the value is smaller than the current, then the pool is reduced to that size gracefully allowing the worker that are going to be removed finish their work. If the value is bigger than the current, then the pool size is increased and jobs are assigned to each worker as needed.
+
+- value - the new size of the worker pool.
+
+``` javascript
+workerPool.size(2);
+```
+
+### workers[]
+
+Array of all the workers. The workers in this array are essentially an adapter for interacting with the underlying worker process. You have several methods available to you that allow you to interact directly with specific worker processes.
+
+### workers[].send(data)
+
+Method for sending data to a specific Worker function.
+
+``` javascript
+workerPool.workers.forEach((worker) => worker.send("Hello world"));
+```
+
+### workers[].invoke(fn, data)
+
+Method for invoking a method on a specific Worker API method.
+
+``` javascript
+workerPool.workers.forEach((worker) => worker.invoke("say", "Hello wold"));
+```
+
+### workers[].stop()
+
+Method to stop a specific worker. This will gracefully let the worker process finish any work in progress before stopping it.
+
+``` javascript
+workerPool.workers.forEach((worker) => worker.stop());
+```
+
+
+## Worker
+
+Class that allows you to define an API that a worker pool can invoke. All you need to do is extend the Worker class to define your API methods, and export it. Workit will internally manage the lifecycle of your Worker API. The methods exposed by the API get two parameters
+
+- data - data to be processed by the method
+- done - a function to be called when the worker method has finished processing the data. You can alternatively return a Promise. If any data is passed to `done` or the resolved promise, that data will be received by the worker pool for the particular job.
+
+Export a simple Worker API with a method `say` that a worker pool can invoke.
+``` javascript
+import Workit form 'workit';
+
+class Worker extends Workit.Worker {
+  say(data) {
+    return Promise.resolve("got it");
+  }
+}
+
+export default Worker;
+```
+
+## isWorker
+
+Flag that is true if the code reading the value is executing in a worker process. Otherwise the value is not defined. `isWorker` is also available in `process.isWorker`.
+
+
+## Thanks!!
+> Currently the name workit is taken up in npm by the now defunct project (https://github.com/shannonmoeller/workit). But the author (Shannon) of that project has been kind enough to let me have the name. Once I get the name I should be able to publish this to npm, which will hopefully happen in the next few days.
