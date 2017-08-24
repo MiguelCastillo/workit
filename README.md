@@ -6,7 +6,7 @@ Parallel processing is traditionally difficult code to write, and that's exactly
 So how does this thing work?  Well - let's think about the setup starting with the worker. A worker is ultimately the child process that processes your data, and you have a couple of ways to define one.
 
 - A module that exports a function which we refer to as a worker function.
-- A module that exports an API by defining class that extends `Worker` with methods that process your data. We refer to this as a Worker API.
+- A module that exports an API by defining a class that extends `Worker` with methods that process your data. We refer to this as a Worker API.
 
 Then you have a worker pool, which is the component you interact with to talk to the workers. A worker pool exposes several methods, but the two important ones for interacting with worker processes are `send` and `invoke`. You use `send` when interacting with a worker function, and you use `invoke` when you interact with a Worker API.
 
