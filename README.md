@@ -255,5 +255,7 @@ export default Worker;
 Flag that is true if the code reading the value is executing in a worker process. Otherwise the value is not defined. `isWorker` is also available in `process.isWorker`.
 
 
+
 ## Thanks!!
-> Currently the name workit is taken up in npm by the now defunct project (https://github.com/shannonmoeller/workit). But the author (Shannon) of that project has been kind enough to let me have the name. Once I get the name I should be able to publish this to npm, which will hopefully happen in the next few days.
+
+> workit used to be taken up in npm by the now defunct project (https://github.com/shannonmoeller/workit). The author - Shannon - of that project is amazing and let me have the name. Thank you, Shannon!
