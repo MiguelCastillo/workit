@@ -10,14 +10,15 @@ const defaults = {
 };
 
 class Adapter {
-  constructor(pool, options) {
+  constructor(pool, options, args) {
     options = options || {};
+    this.args = [].concat(args).filter(Boolean);
     this.settings = Object.assign({}, defaults, options);
     this.pool = pool;
     this.pending = {};
     this.jobs = [];
     this.state = States.available;
-    this.process = childProcess.fork(path.join(__dirname, "./process.js"), [], this.settings);
+    this.process = childProcess.fork(path.join(__dirname, "./process.js"), this.args, this.settings);
   }
 
   send(data) {
