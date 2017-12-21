@@ -6,10 +6,11 @@ var States = require("./worker/states");
 var id = 1;
 
 class Pool {
-  constructor (file, options) {
+  constructor (file, options, args) {
     options = options || {};
     var size = Math.min(options.size || 2, maxProcess);
 
+    this.args = [].concat(args).filter(Boolean);
     this.settings = Object.assign({}, options);
     this.file = file;
     this.jobs = [];
@@ -47,7 +48,7 @@ class Pool {
   }
 
   _add(count) {
-    var workers = Array.apply(null, Array(count)).map(() => new Worker(this, this.settings));
+    var workers = Array.apply(null, Array(count)).map(() => new Worker(this, this.settings, this.args));
     workers.forEach(worker => worker.start(this.file));
     this.workers = this.workers.concat(workers);
   }
