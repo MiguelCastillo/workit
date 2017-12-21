@@ -141,9 +141,21 @@ workit provides you with several different constructs to make parallel processin
 - Worker
 - isWorker
 
-## Pool
+## Pool(filename: string, options: {}, child-args: [])
 
-Class that manages the queue of jobs and worker processes. You can extend Pool in order to define methods that worker processes can invoke, which allows you to build a two way communication between parent and child processes. You can take a look at the example below for `Worker process talking to Process pool`.
+Class that manages the queue of jobs and worker processes. You can extend Pool in order to define methods that worker processes can invoke, which allows you to build a two way communication between parent and child processes. You can take a look at the example below for `Worker process talking to Process pool`. The constructor takes several arguments:
+
+1. The name of the file to spin up as child process.
+2. Settings for the worker pool, which get passed down to the child process.
+3. Child process arguments
+
+``` javascript
+new Pool(path.join(__dirname, "./worker.js"), { size: 2 }, ["--color"]);
+```
+
+For a list of available options for the child process, please take a look at the [nodes child_process.fork](https://nodejs.org/api/child_process.html#child_process_child_process_fork_modulepath_args_options) documentation.
+
+On top of those options, you can pass in the initial size of the pool by specifying `size` as in the example above.
 
 
 ### send(data, worker)
